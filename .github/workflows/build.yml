@@ -1,35 +1,25 @@
-name: Build
+name: Build and Analyze
 
 on:
   push:
     branches:
-      - master  # Trigger on push to master branch
+      - master  # Adjust if you want other branches to trigger this workflow
 
 jobs:
   build:
-    name: Build and analyze
-    runs-on: [self-hosted, linux]  # Specify self-hosted runner with a Linux environment
+    runs-on: ubuntu-latest  # Use a GitHub-hosted runner, such as Ubuntu, Windows, or macOS
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Ensure full history is fetched for accurate analysis
-    
-      - name: Set up JDK 17 (if applicable)
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'  # Set up Java environment, change if using a different language
+        uses: actions/checkout@v4  # This checks out your code repository to the runner
 
-      - name: Run SonarQube scan
+      - name: Set up SonarQube scan
         uses: sonarsource/sonarqube-scan-action@v3
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  # Token for SonarQube authentication
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}  # URL of your SonarQube server
-    
-      # Uncomment this if you want to fail the job when the Quality Gate is red (failing analysis)
-      # - name: Check SonarQube Quality Gate
-      #   uses: sonarsource/sonarqube-quality-gate-action@v2
-      #   timeout-minutes: 5
-      #   env:
-      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  # SonarQube authentication token
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}  # SonarQube server URL
+
+      - name: Run SonarQube Quality Gate
+        uses: sonarsource/sonarqube-quality-gate-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  # SonarQube authentication token
