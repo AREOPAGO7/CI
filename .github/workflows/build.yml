@@ -8,7 +8,7 @@ on:
 jobs:
   build:
     name: Build and analyze
-    runs-on: ubuntu-latest  # Use an Ubuntu runner
+    runs-on: [self-hosted, linux]  # Specify self-hosted runner with a Linux environment
     
     steps:
       - name: Checkout code
@@ -33,4 +33,3 @@ jobs:
       #   timeout-minutes: 5
       #   env:
       #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
