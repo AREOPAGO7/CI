@@ -3,25 +3,34 @@ name: Build
 on:
   push:
     branches:
-      - master
-
+      - master  # Trigger on push to master branch
 
 jobs:
   build:
     name: Build and analyze
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # Use an Ubuntu runner
     
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-      - uses: sonarsource/sonarqube-scan-action@v3
+          fetch-depth: 0  # Ensure full history is fetched for accurate analysis
+    
+      - name: Set up JDK 17 (if applicable)
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'  # Set up Java environment, change if using a different language
+
+      - name: Run SonarQube scan
+        uses: sonarsource/sonarqube-scan-action@v3
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-      # If you wish to fail your job when the Quality Gate is red, uncomment the
-      # following lines. This would typically be used to fail a deployment.
-      # - uses: sonarsource/sonarqube-quality-gate-action@master
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  # Token for SonarQube authentication
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}  # URL of your SonarQube server
+    
+      # Uncomment this if you want to fail the job when the Quality Gate is red (failing analysis)
+      # - name: Check SonarQube Quality Gate
+      #   uses: sonarsource/sonarqube-quality-gate-action@v2
       #   timeout-minutes: 5
       #   env:
       #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
